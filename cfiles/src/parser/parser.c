@@ -41,8 +41,6 @@ cmd_terminal parse_token(const char *token)
 
 int get_tokens(char *input, char *tokens[], int max_tokens)
 {
-    // thread safe resumes if interrupted
-    char *saveptr;
     char *space = strtok(input, " ");
     int cnt = 0;
     while (space && cnt < max_tokens)
