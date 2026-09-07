@@ -31,6 +31,8 @@ typedef struct
     // doing select * only for now
 
     // insert
+    char cols[max_val][max_len];
+    int col_count;
     char values[max_val][max_len];
     int value_count;
 

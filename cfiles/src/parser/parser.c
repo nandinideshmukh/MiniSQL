@@ -156,7 +156,35 @@ void parse_insert(Parser *p, table *cmd)
 
     strncpy(cmd->name, tab, max_len - 1);
     cmd->name[max_len - 1] = '\0';
-    
+
+    // NEW: parse the column list before VALUES
+    if (!expect(p, "("))
+        return;
+
+    cmd->col_count = 0;
+    while (!at_end(p) && cmd->col_count < max_val)
+    {
+        char *col = peek(p);
+        if (!col)
+            return;
+
+        if (strcmp(col, ")") == 0)
+        {
+            advance(p);
+            break;
+        }
+
+        advance(p);
+        strncpy(cmd->cols[cmd->col_count], col, max_len - 1);
+        cmd->cols[cmd->col_count][max_len - 1] = '\0';
+        cmd->col_count++;
+
+        if (!at_end(p) && strcmp(peek(p), ",") == 0)
+        {
+            advance(p);
+        }
+    }
+
     if (!expect(p, "values"))
         return;
 
@@ -164,8 +192,6 @@ void parse_insert(Parser *p, table *cmd)
         return;
 
     cmd->value_count = 0;
-
-    // while loop
     while (!at_end(p) && cmd->value_count < max_val)
     {
         char *val = peek(p);
@@ -175,6 +201,15 @@ void parse_insert(Parser *p, table *cmd)
         if (strcmp(val, ")") == 0)
         {
             advance(p);
+
+            // validation: column count must match value count
+            if (cmd->col_count != cmd->value_count)
+            {
+                p->is_error = 1;
+                snprintf(p->error_msgs, max_len,
+                         "column count (%d) does not match value count (%d)",
+                         cmd->col_count, cmd->value_count);
+            }
             return;
         }
         advance(p);
@@ -190,6 +225,7 @@ void parse_insert(Parser *p, table *cmd)
     p->is_error = 1;
     snprintf(p->error_msgs, max_len, "incorrect query, please check the syntax");
 }
+
 void parse_update(Parser *p, table *cmd)
 {
     cmd->type = cmd_update;
