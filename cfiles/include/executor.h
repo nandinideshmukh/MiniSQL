@@ -13,6 +13,7 @@ ExecMessage execute_select(table* cmd);
 ExecMessage execute_update(table* cmd);
 ExecMessage execute_insert(table* cmd );
 ExecMessage execute_delete(table* cmd);
+void shutdown_v2_engine(void);
 
 // function pointer syntax 
 // return_type (*fname)(args)

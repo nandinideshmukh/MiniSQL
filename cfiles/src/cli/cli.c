@@ -76,6 +76,7 @@ void run_cli(void)
             break;
         case cmd_exit:
             printf("Exiting...\n");
+            shutdown_v2_engine();
             return;
         default:
             printf("Error: unknown command\n");
